@@ -1,3 +1,8 @@
+variable "cidr_block" {
+  description = "CIDR block for VPC"
+  type        = string
+}
+
 variable "reserved_subnet_cidrs" {
   description = "Private reserved subnet CIDR values"
   type        = list(string)
@@ -22,4 +27,10 @@ variable "reserved_subnet_netnums" {
   description = "Private reserved IPv6 cidr prefix"
   type        = list(number)
   default     = [0, 4]
+}
+
+variable "name_prefix" {
+  description = "For naming resources according to the project"
+  type        = string
+  default     = "rails"
 }
