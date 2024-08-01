@@ -1,4 +1,4 @@
-# Ruby On Rails Server
+# AWS Hosted Ruby-On-Rails Web Application Infrastructure 
 
 ## Overview
 ![Architecture of the project](/image.png)
