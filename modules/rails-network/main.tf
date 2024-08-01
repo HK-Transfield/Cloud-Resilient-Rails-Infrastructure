@@ -53,4 +53,4 @@ resource "aws_subnet" "web" {
 }
 
 # todo: Create igw to attach to web subnets -> 'rails-vpc1-igw
-# todo: Create route tables for web subnest (default IPv4 route, default IPv6 route)
+# todo: Create route tables for web subnets (default IPv4 route, default IPv6 route) -> rails-vpc1-rt-web
