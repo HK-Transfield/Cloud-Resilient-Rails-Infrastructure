@@ -4,12 +4,6 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
-variable "azs" {
-  description = "Availability Zones"
-  type        = list(string)
-  default     = ["us-east-1a", "us-east-1b"]
-}
-
 variable "reserved_subnet_cidrs" {
   description = "Private reserved subnet CIDR values"
   type        = list(string)
