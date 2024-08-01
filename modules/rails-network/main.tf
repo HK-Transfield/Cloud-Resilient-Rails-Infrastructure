@@ -1,9 +1,16 @@
+/**
+Module for creating a simple network architecture in AWS.
+
+Contributors: HK Transfield
+*/
+data "aws_availability_zones" "available" {}
+
 resource "aws_vpc" "main" {
-  cidr_block       = "10.17.0.0/16"
+  cidr_block       = var.cidr_block
   instance_tenancy = "default"
 
   tags = {
-    Name = "rails-vpc1"
+    Name = "${var.name_prefix}-vpc1"
   }
 }
 
@@ -15,7 +22,7 @@ resource "aws_subnet" "reserved" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "rails-sn-reserved-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
+    Name = "${var.name_prefix}-sn-reserved-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
   }
 }
 
@@ -26,7 +33,7 @@ resource "aws_subnet" "db" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "rails-sn-db-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
+    Name = "${var.name_prefix}-sn-db-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
   }
 }
 
@@ -37,7 +44,7 @@ resource "aws_subnet" "app" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "rails-sn-app-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
+    Name = "${var.name_prefix}-sn-app-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
   }
 }
 
@@ -48,7 +55,7 @@ resource "aws_subnet" "web" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "rails-sn-web-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
+    Name = "${var.name_prefix}-sn-web-${(count.index + 1) % 2 == 0 ? "B" : "A"}"
   }
 }
 
