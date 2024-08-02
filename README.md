@@ -17,7 +17,7 @@ infrastructure, this uses Ruby on Rails as the webserver and it would
 have a domain that would show it would alternate between the Availability 
 zones.
 
-If working correctly, the load balancer will alternate between the 2 ALZ's.
+If working correctly, the load balancer will alternate between the 2 AZs.
 
 ---
 
