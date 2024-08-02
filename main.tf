@@ -2,6 +2,11 @@
 Name: Ruby on Rails AWS Web Server
 Contributors: HK Transfield
 */
+module "webapp" {
+  source          = "./modules/rails-web-server"
+  script_filename = "script.sh"
+}
+
 module "network" {
   source     = "./modules/rails-network"
   cidr_block = "10.17.0.0/16"
