@@ -6,9 +6,12 @@ Contributors: HK Transfield
 data "aws_availability_zones" "available" {}
 
 locals {
-  newbits = 8
+  newbits     = 8
+  vpc_prefix  = "vpc1"
+  az_prefixes = ["A", "B"]
 }
 
+## SECTION 1: Virtual Private Cloud
 resource "aws_vpc" "this" {
   cidr_block                       = var.cidr_block
   instance_tenancy                 = "default"
@@ -16,10 +19,11 @@ resource "aws_vpc" "this" {
   assign_generated_ipv6_cidr_block = true
 
   tags = {
-    Name = "${var.name_prefix}-vpc1"
+    Name = "${var.name_prefix}-${local.vpc_prefix}"
   }
 }
 
+## SECTION 2: Subnets
 resource "aws_subnet" "reserved" {
   for_each                        = var.reserved_subnet_cidrs
   vpc_id                          = aws_vpc.this.id
@@ -73,15 +77,36 @@ resource "aws_subnet" "web" {
   }
 }
 
+## SECTION 3: Internet Gateways
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
   tags = {
-    Name = "${var.name_prefix}-vpc1-igw"
+    Name = "${var.name_prefix}-${local.vpc_prefix}-igw"
   }
 }
 
-resource "aws_route_table" "this" {
+## SECTION 4: Network Address Translation Gateway
+resource "aws_nat_gateway" "this" {
+  for_each          = aws_subnet.web
+  subnet_id         = each.value.id
+  allocation_id     = aws_eip.public[each.key].id
+  connectivity_type = "public"
+
+  tags = {
+    Name = "${var.name_prefix}-${local.vpc_prefix}-natgw-${each.key}"
+  }
+
+  depends_on = [aws_internet_gateway.this] # Recommended to add explicit dependency on IGW for VPC.
+}
+
+resource "aws_eip" "public" {
+  for_each = toset(local.az_prefixes)
+  domain   = "vpc"
+}
+
+## SECTION 4: Route Tables
+resource "aws_route_table" "web" {
   vpc_id = aws_vpc.this.id
 
   route {
@@ -95,12 +120,39 @@ resource "aws_route_table" "this" {
   }
 
   tags = {
-    Name = "${var.name_prefix}-vpc1-rt-web"
+    Name = "${var.name_prefix}-${local.vpc_prefix}-rt-web"
   }
 }
 
-resource "aws_route_table_association" "this" {
+resource "aws_route_table_association" "web" {
   for_each       = aws_subnet.web
   subnet_id      = each.value.id
-  route_table_id = aws_route_table.this.id
+  route_table_id = aws_route_table.web.id
+}
+
+resource "aws_route_table" "private" {
+  for_each = toset(local.az_prefixes)
+  vpc_id   = aws_vpc.this.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.this[each.key].id
+  }
+
+  tags = {
+    Name = "${var.name_prefix}-${local.vpc_prefix}-rt-private${each.key}"
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  for_each = {
+    for az_prefix in local.az_prefixes : az_prefix => {
+      "reserved" = aws_subnet.reserved[az_prefix]
+      "db"       = aws_subnet.db[az_prefix]
+      "app"      = aws_subnet.app[az_prefix]
+    }
+  }
+
+  subnet_id      = each.value[each.key].id
+  route_table_id = aws_route_table.private[each.key].id
 }
