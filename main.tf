@@ -2,10 +2,15 @@
 Name: Ruby on Rails AWS Web Server
 Contributors: HK Transfield
 */
-# module "webapp" {
-#   source          = "./modules/rails-web-server"
-#   script_filename = "script.sh"
-# }
+
+data "aws_key_pair" "this" {
+  key_name = "rails-key"
+}
+
+module "webapp" {
+  source   = "./modules/rails-web-server"
+  key_name = data.aws_key_pair.this.key_name
+}
 
 module "network" {
   source     = "./modules/rails-network"
