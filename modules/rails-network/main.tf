@@ -86,11 +86,11 @@ resource "aws_internet_gateway" "this" {
   }
 }
 
-## SECTION 4: Network Address Translation Gateway
+## SECTION 4: Network Address Translation Gateway w/ Elastic IPs
 resource "aws_nat_gateway" "this" {
   for_each          = aws_subnet.web
   subnet_id         = each.value.id
-  allocation_id     = aws_eip.public[each.key].id
+  allocation_id     = aws_eip.this[each.key].id
   connectivity_type = "public"
 
   tags = {
@@ -100,7 +100,7 @@ resource "aws_nat_gateway" "this" {
   depends_on = [aws_internet_gateway.this] # Recommended to add explicit dependency on IGW for VPC.
 }
 
-resource "aws_eip" "public" {
+resource "aws_eip" "this" {
   for_each = toset(local.az_prefixes)
   domain   = "vpc"
 }
@@ -144,15 +144,20 @@ resource "aws_route_table" "private" {
   }
 }
 
-resource "aws_route_table_association" "private" {
-  for_each = {
-    for az_prefix in local.az_prefixes : az_prefix => {
-      "reserved" = aws_subnet.reserved[az_prefix]
-      "db"       = aws_subnet.db[az_prefix]
-      "app"      = aws_subnet.app[az_prefix]
-    }
-  }
+resource "aws_route_table_association" "reserved" {
+  for_each       = aws_subnet.reserved
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.private[each.key].id
+}
 
-  subnet_id      = each.value[each.key].id
+resource "aws_route_table_association" "db" {
+  for_each       = aws_subnet.db
+  subnet_id      = each.value.id
+  route_table_id = aws_route_table.private[each.key].id
+}
+
+resource "aws_route_table_association" "app" {
+  for_each       = aws_subnet.app
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.private[each.key].id
 }
