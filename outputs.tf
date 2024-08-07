@@ -1,3 +1,7 @@
+output "region" {
+  value = var.aws_region
+}
+
 output "fingerprint" {
   value = data.aws_key_pair.this.fingerprint
 }

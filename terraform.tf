@@ -13,6 +13,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    cloudinit = {
+      source  = "hashicorp/cloudinit"
+      version = "2.3.4"
+    }
   }
 }
 
@@ -20,3 +24,6 @@ terraform {
 provider "aws" {
   region = var.aws_region
 }
+
+# No configuration needed for this provider
+provider "cloudinit" {}
