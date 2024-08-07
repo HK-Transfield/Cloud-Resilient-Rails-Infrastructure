@@ -4,8 +4,8 @@ Contributors: HK Transfield
 */
 
 locals {
-  filename = "script.sh"
-  filepath = "${path.module}/${local.filename}"
+  filename = "install_rails.sh"
+  filepath = "${path.module}/scripts/${local.filename}"
 }
 
 data "cloudinit_config" "user_data" {
