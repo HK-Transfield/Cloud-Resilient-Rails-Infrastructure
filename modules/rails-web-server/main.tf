@@ -23,7 +23,7 @@ data "cloudinit_config" "user_data" {
 #TODO: https://developer.hashicorp.com/terraform/language/resources/provisioners/syntax
 #todo: https://registry.terraform.io/providers/hashicorp/cloudinit/latest/docs/data-sources/config
 resource "aws_instance" "webserver" {
-  ami             = "ami-0ae8f15ae66fe8cda"
+  ami             = "ami-0a0e5d9c7acc336f1"
   instance_type   = "t2.micro"
   key_name        = var.key_name
   security_groups = ["launch-wizard-1"]
