@@ -1,7 +1,7 @@
 # AWS Hosted Ruby-On-Rails Web Application Infrastructure 
 
 ## Overview
-![Architecture of the project](/image.png)
+![Architecture of the project](/img/architecture.png)
 
 The goal of this project is to help with familiarising 
 yourself with deploying an entire infrastructure in 
@@ -48,4 +48,5 @@ If working correctly, the load balancer will alternate between the 2 AZs.
 subnets in each AZ.
 * The following default routes were added:
 
-## Rails Web Server Architecture
+## Web Server Architecture
+The Ruby on Rails server runs on an EC2 instance.
