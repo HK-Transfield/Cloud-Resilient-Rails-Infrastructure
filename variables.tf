@@ -4,48 +4,20 @@ variable "aws_region" {
   default     = ""
 }
 
-variable "cidr_block" {
-  description = "CIDR block to assign to VPC"
+variable "db_username" {
+  description = "The master username for the RDS database"
   type        = string
-  default     = ""
+  sensitive   = true
 }
 
-variable "reserved" {
-  description = "Private reserved subnet CIDR values"
-  type = map(object({
-    cidr_block             = string
-    ipv6_cidr_block_netnum = number
-    az_name_index          = number
-  }))
-  default = {}
+variable "db_password" {
+  description = "The master password for the RDS database"
+  type        = string
+  sensitive   = true
 }
 
-variable "db" {
-  description = "Private database subnet CIDR values"
-  type = map(object({
-    cidr_block             = string
-    ipv6_cidr_block_netnum = number
-    az_name_index          = number
-  }))
-  default = {}
-}
-
-variable "app" {
-  description = "Private application subnet CIDR values"
-  type = map(object({
-    cidr_block             = string
-    ipv6_cidr_block_netnum = number
-    az_name_index          = number
-  }))
-  default = {}
-}
-
-variable "web" {
-  description = "Public web subnet CIDR values"
-  type = map(object({
-    cidr_block             = string
-    ipv6_cidr_block_netnum = number
-    az_name_index          = number
-  }))
-  default = {}
+variable "my_ip" {
+  description = "Personal IP address"
+  type        = string
+  sensitive   = true
 }
