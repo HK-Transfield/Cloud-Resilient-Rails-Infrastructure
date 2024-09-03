@@ -11,7 +11,9 @@ locals {
   az_prefixes = ["A", "B"]
 }
 
-## SECTION 1: Virtual Private Cloud
+################################################################################
+# Virtual Private Cloud
+################################################################################
 resource "aws_vpc" "this" {
   cidr_block                       = var.cidr_block
   instance_tenancy                 = "default"
@@ -23,7 +25,9 @@ resource "aws_vpc" "this" {
   }
 }
 
-## SECTION 2: Subnets
+################################################################################
+# Subnets
+################################################################################
 resource "aws_subnet" "reserved" {
   for_each                        = var.reserved_subnet_cidrs
   vpc_id                          = aws_vpc.this.id
@@ -77,7 +81,9 @@ resource "aws_subnet" "web" {
   }
 }
 
-## SECTION 3: Internet Gateways
+################################################################################
+# Internet Gateway
+################################################################################
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
@@ -86,7 +92,9 @@ resource "aws_internet_gateway" "this" {
   }
 }
 
-## SECTION 4: Network Address Translation Gateway w/ Elastic IPs
+################################################################################
+# Network Address Translation Gateway w/ Elastic IPs
+################################################################################
 resource "aws_nat_gateway" "this" {
   for_each          = aws_subnet.web
   subnet_id         = each.value.id
@@ -105,7 +113,9 @@ resource "aws_eip" "this" {
   domain   = "vpc"
 }
 
-## SECTION 4: Route Tables
+################################################################################
+# Route Tables
+################################################################################
 resource "aws_route_table" "web" {
   vpc_id = aws_vpc.this.id
 
