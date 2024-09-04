@@ -36,3 +36,25 @@ variable "rds_allocated_storage" {
   type        = number
   default     = 10
 }
+
+variable "skip_final_snapshot" {
+  description = "Skips final snapshot of the database"
+  type        = bool
+  default     = true
+}
+
+################################################################################
+# Database Login
+################################################################################
+
+variable "db_username" {
+  description = "The admin username for the database"
+  type        = string
+  default     = "admin"
+}
+
+variable "db_password" {
+  description = "The admin password for the database"
+  type        = string
+  sensitive   = true
+}

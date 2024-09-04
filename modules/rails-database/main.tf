@@ -6,29 +6,27 @@ Contributors: HK Transfield
 ################################################################################
 # RDS Instance
 ################################################################################
+locals {
+  db_name = "${var.name_prefix}-rds-instance"
+}
+
 #TODO: https://medium.com/strategio/using-terraform-to-create-aws-vpc-ec2-and-rds-instances-c7f3aa416133
 resource "aws_db_instance" "this" {
-  identifier = "${var.name_prefix}-rds-instance"
-
-  engine         = var.rds_engine
-  engine_version = var.rds_engine_version
-
-  instance_class    = var.rds_instance_class
-  allocated_storage = var.rds_allocated_storage
-  storage_type      = var.rds_storage_type
-
-  db_name                = var.rds_db_name
-  username               = var.rds_username
-  password               = var.rds_password
-  port                   = var.rds_port
+  identifier             = local.db_name
+  engine                 = var.rds_engine
+  engine_version         = var.rds_engine_version
+  instance_class         = var.rds_instance_class
+  allocated_storage      = var.rds_allocated_storage
+  db_name                = local.db_name
+  username               = var.db_username
+  password               = var.db_password
   vpc_security_group_ids = [aws_security_group.this.id]
   db_subnet_group_name   = aws_db_subnet_group.this.name
-
-  skip_final_snapshot = var.rds_skip_final_snapshot
-  apply_immediately   = var.rds_apply_immediately
+  skip_final_snapshot    = var.skip_final_snapshot
 
   tags = {
-    Name = "${var.name_prefix}-rds"
+    Name    = "${var.name_prefix}-rds"
+    project = var.name_prefix
   }
 }
 
