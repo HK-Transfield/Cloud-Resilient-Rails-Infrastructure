@@ -4,6 +4,15 @@ variable "name_prefix" {
   default     = "rails"
 }
 
+################################################################################
+# Database Settings
+################################################################################
+
+variable "vpc_id" {
+  description = "The ID of the VPC"
+  type        = string
+}
+
 variable "subnet_ids" {
   description = "List of VPC subnet IDs"
   type        = list(string)
