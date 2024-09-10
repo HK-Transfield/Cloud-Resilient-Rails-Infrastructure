@@ -4,10 +4,11 @@ Contributors: HK Transfield
 */
 
 ################################################################################
-# RDS Instance
+# RDS Database Instance
 ################################################################################
+
 locals {
-  db_name = "${var.name_prefix}-rds-instance"
+  db_name = "${var.name_prefix}-db"
 }
 
 #TODO: https://medium.com/strategio/using-terraform-to-create-aws-vpc-ec2-and-rds-instances-c7f3aa416133
@@ -25,27 +26,47 @@ resource "aws_db_instance" "this" {
   skip_final_snapshot    = var.skip_final_snapshot
 
   tags = {
-    Name    = "${var.name_prefix}-rds"
-    project = var.name_prefix
+    Name    = local.db_name
+    Project = var.name_prefix
   }
 }
 
 ################################################################################
 # RDS Subnet Group
 ################################################################################
+
 locals {
-  rds_subnet_group_name = "${var.name_prefix}-rds-subnet-group"
+  db_subnet_group_name = "${local.db_name}-subnet-group"
 }
 
 resource "aws_db_subnet_group" "this" {
-  name       = local.rds_subnet_group_name
+  name       = local.db_subnet_group_name
   subnet_ids = var.subnet_ids
 
   tags = {
-    Name = local.rds_subnet_group_name
+    Name    = local.db_subnet_group_name
+    Project = var.name_prefix
   }
 }
 
 ################################################################################
 # RDS Security Group
 ################################################################################
+
+locals {
+  db_security_group_name = "${local.db_name}-sg"
+}
+
+resource "aws_security_group" "this" {
+  name        = local.db_security_group_name
+  description = "Security Group for the ${var.name_prefix} Database"
+  vpc_id      = var.vpc_id
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_db_traffic" {
+  security_group_id = aws_security_group.this.id
+  description       = "Allow DB Traffic only from the web security group"
+  from_port         = 3306
+  to_port           = 3306
+  ip_protocol       = "tcp"
+}
