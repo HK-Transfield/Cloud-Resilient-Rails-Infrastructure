@@ -25,6 +25,11 @@ data "aws_ami" "amazon_linux" {
 # EC2 User Data
 ################################################################################
 
+locals {
+  filename = "install_rails_yum.sh"
+  filepath = "${path.module}/scripts/${local.filename}"
+}
+
 data "cloudinit_config" "user_data" {
   part {
     filename     = local.filename
@@ -34,47 +39,51 @@ data "cloudinit_config" "user_data" {
   }
 }
 
+################################################################################
+# EC2 App Server Instance
+################################################################################
+
 locals {
-  filename = "install_rails_yum.sh"
-  filepath = "${path.module}/scripts/${local.filename}"
+  web_server_name = "${var.name_prefix}-app-server"
 }
 
-################################################################################
-# EC2 Web Server
-################################################################################
-
-resource "aws_instance" "webserver" {
+resource "aws_instance" "this" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = var.instance_type
   key_name               = var.key_name
   subnet_id              = var.subnet_id
-  vpc_security_group_ids = [aws_security_group.webserver.id]
+  vpc_security_group_ids = [aws_security_group.this.id]
 
   tags = {
-    Name    = "${var.name_prefix}-web-server"
+    Name    = local.web_server_name
     Project = var.name_prefix
   }
 
-  user_data = data.cloudinit_config.user_data.rendered
+  #! This is not working as intented
+  # user_data = data.cloudinit_config.user_data.rendered
 }
 
 ################################################################################
-# VPC Security Group
+# EC2 Security Group
 ################################################################################
 
-resource "aws_security_group" "webserver" {
-  name        = "${var.name_prefix}-sg"
-  description = "Security Group for ${var.name_prefix} Web Server"
+locals {
+  web_server_security_group_name = "${local.web_server_name}-sg"
+}
+
+resource "aws_security_group" "this" {
+  name        = local.web_server_security_group_name
+  description = "Security Group for the ${var.name_prefix} Web Server"
   vpc_id      = var.vpc_id
 
   tags = {
-    Name    = "${var.name_prefix}-sg"
+    Name    = local.web_server_security_group_name
     Project = var.name_prefix
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "name" {
-  security_group_id = aws_security_group.webserver.id
+resource "aws_vpc_security_group_ingress_rule" "allow_all_ssh" {
+  security_group_id = aws_security_group.this.id
   description       = "SSH from anywhere"
   from_port         = 22
   to_port           = 22
@@ -82,7 +91,7 @@ resource "aws_vpc_security_group_ingress_rule" "name" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_egress_rule" "name" {
+resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
   security_group_id = aws_security_group.webserver.id
   from_port         = 0
   to_port           = 0
