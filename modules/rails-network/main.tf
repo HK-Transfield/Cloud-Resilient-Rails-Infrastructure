@@ -14,6 +14,11 @@ locals {
 ################################################################################
 # Virtual Private Cloud
 ################################################################################
+
+locals {
+  vpc_name = "${var.name_prefix}-${local.vpc_prefix}"
+}
+
 resource "aws_vpc" "this" {
   cidr_block                       = var.cidr_block
   instance_tenancy                 = "default"
@@ -21,24 +26,17 @@ resource "aws_vpc" "this" {
   assign_generated_ipv6_cidr_block = true
 
   tags = {
-    Name = "${var.name_prefix}-${local.vpc_prefix}"
+    Name    = local.vpc_name
+    Project = var.name_prefix
   }
 }
 
 ################################################################################
 # Subnets
 ################################################################################
-resource "aws_subnet" "reserved" {
-  for_each                        = var.reserved_subnet_cidrs
-  vpc_id                          = aws_vpc.this.id
-  cidr_block                      = each.value.cidr_block
-  ipv6_cidr_block                 = cidrsubnet(aws_vpc.this.ipv6_cidr_block, local.newbits, each.value.ipv6_cidr_block_netnum)
-  availability_zone               = data.aws_availability_zones.available.names[each.value.az_name_index]
-  assign_ipv6_address_on_creation = true
 
-  tags = {
-    Name = "${var.name_prefix}-sn-reserved-${each.key}"
-  }
+locals {
+  subnet_name = "${var.name_prefix}-sn"
 }
 
 resource "aws_subnet" "db" {
@@ -46,11 +44,12 @@ resource "aws_subnet" "db" {
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = each.value.cidr_block
   ipv6_cidr_block                 = cidrsubnet(aws_vpc.this.ipv6_cidr_block, local.newbits, each.value.ipv6_cidr_block_netnum)
-  availability_zone               = data.aws_availability_zones.available.names[each.value.az_name_index]
+  availability_zone               = each.value.availability_zone
   assign_ipv6_address_on_creation = true
 
   tags = {
-    Name = "${var.name_prefix}-sn-db-${each.key}"
+    Name    = "${local.subnet_name}-db-${each.key}"
+    Project = var.name_prefix
   }
 }
 
@@ -59,11 +58,12 @@ resource "aws_subnet" "app" {
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = each.value.cidr_block
   ipv6_cidr_block                 = cidrsubnet(aws_vpc.this.ipv6_cidr_block, local.newbits, each.value.ipv6_cidr_block_netnum)
-  availability_zone               = data.aws_availability_zones.available.names[each.value.az_name_index]
+  availability_zone               = each.value.availability_zone
   assign_ipv6_address_on_creation = true
 
   tags = {
-    Name = "${var.name_prefix}-sn-app-${each.key}"
+    Name    = "${local.subnet_name}-app-${each.key}"
+    Project = var.name_prefix
   }
 }
 
@@ -72,29 +72,41 @@ resource "aws_subnet" "web" {
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = each.value.cidr_block
   ipv6_cidr_block                 = cidrsubnet(aws_vpc.this.ipv6_cidr_block, local.newbits, each.value.ipv6_cidr_block_netnum)
-  availability_zone               = data.aws_availability_zones.available.names[each.value.az_name_index]
+  availability_zone               = each.value.availability_zone
   assign_ipv6_address_on_creation = true
   map_public_ip_on_launch         = true
 
   tags = {
-    Name = "${var.name_prefix}-sn-web-${each.key}"
+    Name    = "${local.subnet_name}-web-${each.key}"
+    Project = var.name_prefix
   }
 }
 
 ################################################################################
 # Internet Gateway
 ################################################################################
+
+locals {
+  igw_name = "${local.vpc_name}-igw"
+}
+
 resource "aws_internet_gateway" "this" {
   vpc_id = aws_vpc.this.id
 
   tags = {
-    Name = "${var.name_prefix}-${local.vpc_prefix}-igw"
+    Name    = local.igw_name
+    Project = var.name_prefix
   }
 }
 
 ################################################################################
 # Network Address Translation Gateway w/ Elastic IPs
 ################################################################################
+
+locals {
+  nat_gateway_name = "${local.vpc_name}-natgw"
+}
+
 resource "aws_nat_gateway" "this" {
   for_each          = aws_subnet.web
   subnet_id         = each.value.id
@@ -102,7 +114,8 @@ resource "aws_nat_gateway" "this" {
   connectivity_type = "public"
 
   tags = {
-    Name = "${var.name_prefix}-${local.vpc_prefix}-natgw-${each.key}"
+    Name    = "${local.nat_gateway_name}-${each.key}"
+    Project = var.name_prefix
   }
 
   depends_on = [aws_internet_gateway.this] # Recommended to add explicit dependency on IGW for VPC.
@@ -114,8 +127,13 @@ resource "aws_eip" "this" {
 }
 
 ################################################################################
-# Route Tables
+# Public Route Tables
 ################################################################################
+
+locals {
+  route_table_name = "${local.vpc_name}-rt"
+}
+
 resource "aws_route_table" "web" {
   vpc_id = aws_vpc.this.id
 
@@ -130,7 +148,8 @@ resource "aws_route_table" "web" {
   }
 
   tags = {
-    Name = "${var.name_prefix}-${local.vpc_prefix}-rt-web"
+    Name    = "${local.route_table_name}-web"
+    Project = var.name_prefix
   }
 }
 
@@ -139,6 +158,10 @@ resource "aws_route_table_association" "web" {
   subnet_id      = each.value.id
   route_table_id = aws_route_table.web.id
 }
+
+################################################################################
+# Private Route Tables
+################################################################################
 
 resource "aws_route_table" "private" {
   for_each = toset(local.az_prefixes)
@@ -150,14 +173,9 @@ resource "aws_route_table" "private" {
   }
 
   tags = {
-    Name = "${var.name_prefix}-${local.vpc_prefix}-rt-private${each.key}"
+    Name    = "${local.route_table_name}-private-${each.key}"
+    Project = var.name_prefix
   }
-}
-
-resource "aws_route_table_association" "reserved" {
-  for_each       = aws_subnet.reserved
-  subnet_id      = each.value.id
-  route_table_id = aws_route_table.private[each.key].id
 }
 
 resource "aws_route_table_association" "db" {
