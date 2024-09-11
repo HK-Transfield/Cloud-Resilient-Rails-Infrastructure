@@ -8,7 +8,7 @@ Contributors: HK Transfield
 ################################################################################
 
 locals {
-  db_name = "${var.name_prefix}-db"
+  db_name = "${var.project_name}-db"
 }
 
 #TODO: https://medium.com/strategio/using-terraform-to-create-aws-vpc-ec2-and-rds-instances-c7f3aa416133
@@ -27,7 +27,7 @@ resource "aws_db_instance" "this" {
 
   tags = {
     Name    = local.db_name
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -45,7 +45,7 @@ resource "aws_db_subnet_group" "this" {
 
   tags = {
     Name    = local.db_subnet_group_name
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -59,7 +59,7 @@ locals {
 
 resource "aws_security_group" "this" {
   name        = local.db_security_group_name
-  description = "Security Group for the ${var.name_prefix} Database"
+  description = "Security Group for the ${var.project_name} Database"
   vpc_id      = var.vpc_id
 }
 

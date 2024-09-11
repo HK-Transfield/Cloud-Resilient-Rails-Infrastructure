@@ -16,7 +16,7 @@ locals {
 ################################################################################
 
 locals {
-  vpc_name = "${var.name_prefix}-${local.vpc_prefix}"
+  vpc_name = "${var.project_name}-${local.vpc_prefix}"
 }
 
 resource "aws_vpc" "this" {
@@ -27,7 +27,7 @@ resource "aws_vpc" "this" {
 
   tags = {
     Name    = local.vpc_name
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -36,7 +36,7 @@ resource "aws_vpc" "this" {
 ################################################################################
 
 locals {
-  subnet_name = "${var.name_prefix}-sn"
+  subnet_name = "${var.project_name}-sn"
 }
 
 resource "aws_subnet" "db" {
@@ -49,7 +49,7 @@ resource "aws_subnet" "db" {
 
   tags = {
     Name    = "${local.subnet_name}-db-${each.key}"
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -63,7 +63,7 @@ resource "aws_subnet" "app" {
 
   tags = {
     Name    = "${local.subnet_name}-app-${each.key}"
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -78,7 +78,7 @@ resource "aws_subnet" "web" {
 
   tags = {
     Name    = "${local.subnet_name}-web-${each.key}"
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -95,7 +95,7 @@ resource "aws_internet_gateway" "this" {
 
   tags = {
     Name    = local.igw_name
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -115,7 +115,7 @@ resource "aws_nat_gateway" "this" {
 
   tags = {
     Name    = "${local.nat_gateway_name}-${each.key}"
-    Project = var.name_prefix
+    Project = var.project_name
   }
 
   depends_on = [aws_internet_gateway.this] # Recommended to add explicit dependency on IGW for VPC.
@@ -149,7 +149,7 @@ resource "aws_route_table" "web" {
 
   tags = {
     Name    = "${local.route_table_name}-web"
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
@@ -174,7 +174,7 @@ resource "aws_route_table" "private" {
 
   tags = {
     Name    = "${local.route_table_name}-private-${each.key}"
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 

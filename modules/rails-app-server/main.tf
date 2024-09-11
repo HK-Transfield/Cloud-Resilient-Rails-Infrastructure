@@ -44,7 +44,7 @@ data "cloudinit_config" "user_data" {
 ################################################################################
 
 locals {
-  web_server_name = "${var.name_prefix}-app-server"
+  web_server_name = "${var.project_name}-app-server"
 }
 
 resource "aws_instance" "this" {
@@ -56,7 +56,7 @@ resource "aws_instance" "this" {
 
   tags = {
     Name    = local.web_server_name
-    Project = var.name_prefix
+    Project = var.project_name
   }
 
   #! This is not working as intented
@@ -73,12 +73,12 @@ locals {
 
 resource "aws_security_group" "this" {
   name        = local.web_server_security_group_name
-  description = "Security Group for the ${var.name_prefix} Web Server"
+  description = "Security Group for the ${var.project_name} Web Server"
   vpc_id      = var.vpc_id
 
   tags = {
     Name    = local.web_server_security_group_name
-    Project = var.name_prefix
+    Project = var.project_name
   }
 }
 
