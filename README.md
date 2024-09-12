@@ -22,21 +22,3 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 2. **Application Subnet:** A *private* Auto Scaling Group for spinning up another EC2 instance of the Rails webapp in required.
 3. **Database Subnet:** A *private* RDS database with Multi-AZ configured.
 
-<!-- SECTION DISCUSSING VPC -->
-
-
-
-<!-- SECTION DISCUSSING ALB -->
-
-
-
-<!-- SECTION DISCUSSING AUTO SCALING GROUP -->
-
-
-
-<!-- SECTION DISCUSSING APPLICATION SERVER -->
-
-
-
-<!-- SECTION DISCUSSING DATABASE CONFIGURATION -->
-
