@@ -98,3 +98,23 @@ resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
   ip_protocol       = "-1" # Allows all outbound traffic
   cidr_ipv4         = "0.0.0.0/0"
 }
+
+################################################################################
+# Autoscaling Group
+################################################################################
+
+locals {
+  asg_name = "${var.project_name}-asg"
+}
+
+resource "aws_autoscaling_group" "this" {
+  name                      = local.asg_name
+  min_size                  = 1
+  max_size                  = 2
+  desired_capacity          = 1
+  health_check_grace_period = 300
+  health_check_type         = "EC2"
+  vpc_zone_identifier       = var.vpc_zone_identifiers
+  target_group_arns         = var.target_group_arns
+  #   launch_configuration      = aws_launch_configuration.rubyonrails.name
+}
