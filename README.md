@@ -22,6 +22,8 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 2. **Application Subnet:** A *private* Auto Scaling Group for spinning up another EC2 instance of the Rails webapp in required.
 3. **Database Subnet:** A *private* RDS database with Multi-AZ configured.
 
+<!-- SECTION DISCUSSING VPC -->
+
 ## VPC Network Infrastructure 🌐
 
 * Assigned a CIDR block of 10.17.0.0/16.
@@ -55,6 +57,28 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 * A route table is attached to the VPC, and associated with the public web
   subnets in each AZ.
 * The following default routes were added:
+
+<!-- SECTION DISCUSSING ALB -->
+
+## Application Load Balancer 🚦
+
+TBD.
+
+### ALB Security Group
+
+TBD.
+
+<!-- SECTION DISCUSSING AUTO SCALING GROUP -->
+
+## Auto Scaling Group ⚖️
+
+TBD.
+
+### ASG Security Group
+
+TBD.
+
+<!-- SECTION DISCUSSING APPLICATION SERVER -->
 
 ## EC2 Application Server 💽
 
@@ -107,6 +131,8 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 TBD.
 
+<!-- SECTION DISCUSSING DATABASE CONFIGURATION -->
+
 ## RDS Database 🗄️
 
 TBD.
@@ -114,12 +140,3 @@ TBD.
 ### DB Security Group
 
 TBD.
-
-## Application Load Balancer 🚦
-
-TBD.
-
-### ALB Security Group
-
-TBD.
-
