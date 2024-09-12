@@ -1,13 +1,9 @@
 /**
-Module for creating a simple network architecture in AWS.
-
-Contributors: HK Transfield
+Name: Cloud Resilient Network Configuration
+Contributors: HK Transfield, 2024
 */
-data "aws_availability_zones" "available" {}
 
 locals {
-  newbits     = 8
-  vpc_prefix  = "vpc1"
   az_prefixes = ["A", "B"]
 }
 
@@ -16,7 +12,7 @@ locals {
 ################################################################################
 
 locals {
-  vpc_name = "${var.project_name}-${local.vpc_prefix}"
+  vpc_name = "${var.project_name}-vpc1"
 }
 
 resource "aws_vpc" "this" {
@@ -37,6 +33,7 @@ resource "aws_vpc" "this" {
 
 locals {
   subnet_name = "${var.project_name}-sn"
+  newbits     = 8
 }
 
 resource "aws_subnet" "db" {

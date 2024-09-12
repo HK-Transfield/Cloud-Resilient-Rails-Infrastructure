@@ -1,10 +1,10 @@
 /**
-Name: Ruby of Rails Database Infrastructure
-Contributors: HK Transfield
+Name: Cloud Resilient Database Configuration
+Contributors: HK Transfield, 2024
 */
 
 ################################################################################
-# RDS Database Instance
+# RDS Instance
 ################################################################################
 
 locals {

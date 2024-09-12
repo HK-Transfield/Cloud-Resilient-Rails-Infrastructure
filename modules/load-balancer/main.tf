@@ -1,6 +1,6 @@
 /**
-Name: Ruby of Rails Application Load Balancing
-Contributors: HK Transfield
+Name: Cloud Resilient Application Load Balancer Configuration
+Contributors: HK Transfield, 2024
 */
 
 ################################################################################
