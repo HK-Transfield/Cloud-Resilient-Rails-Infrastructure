@@ -6,7 +6,7 @@ Contributors: HK Transfield
 data "aws_availability_zones" "available" {}
 
 ################################################################################
-# Rails Network Infrastructure Module
+# Rails Network Configuration
 ################################################################################
 
 locals {
@@ -56,7 +56,7 @@ module "rails-network" {
 }
 
 ################################################################################
-# Rails Autoscaling Group Module
+# Rails Autoscaling Group Configuration
 ################################################################################
 
 locals {
@@ -76,13 +76,13 @@ resource "aws_autoscaling_group" "this" {
 }
 
 ################################################################################
-# Rails Application Load Balancer Module
+# Rails Application Load Balancer Configuration
 ################################################################################
 
 #TODO
 
 ################################################################################
-# Rails Application Server Instance Module
+# Rails Application Server Configuration
 ################################################################################
 
 data "aws_key_pair" "this" {
@@ -104,7 +104,7 @@ module "rails-app-server-A" {
 # }
 
 ################################################################################
-# Rails Database Instance Module
+# Rails Database Configuration
 ################################################################################
 
 #TODO
