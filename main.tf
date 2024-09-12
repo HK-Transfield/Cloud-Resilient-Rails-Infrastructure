@@ -1,13 +1,17 @@
 /**
 Name: Cloud Resilient Ruby-on-Rails Infrastructure
-Contributors: HK Transfield
-*/
+Contributors: HK Transfield, 2024
 
-data "aws_availability_zones" "available" {}
+A simple Infrastructure-as-Code (IAC) project that 
+provisions a simple Ruby-on-Rails application in 
+AWS using Terraform. 
+*/
 
 ################################################################################
 # Rails Network Configuration
 ################################################################################
+
+data "aws_availability_zones" "available" {}
 
 locals {
   az_a = data.aws_availability_zones.available.names[0]
