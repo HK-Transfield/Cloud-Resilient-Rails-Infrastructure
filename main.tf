@@ -68,6 +68,12 @@ module "rails-network" {
 }
 
 ################################################################################
+# Rails Application Load Balancer Configuration
+################################################################################
+
+#TODO - Add alb config to root module
+
+################################################################################
 # Rails Autoscaling Group Configuration
 ################################################################################
 
@@ -102,12 +108,6 @@ locals {
 resource "aws_s3_bucket" "logs" {
   bucket = local.bucket_name
 }
-
-################################################################################
-# Rails Application Load Balancer Configuration
-################################################################################
-
-#TODO - Add alb config to root module
 
 ################################################################################
 # Rails Application Server Configuration
