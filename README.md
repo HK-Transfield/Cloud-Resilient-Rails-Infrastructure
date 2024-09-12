@@ -22,15 +22,13 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 2. **Application Subnet:** A *private* Auto Scaling Group for spinning up another EC2 instance of the Rails webapp in required.
 3. **Database Subnet:** A *private* RDS database with Multi-AZ configured.
 
-## Network Infrastructure 🌐
-
-### Virtual Private Cloud (VPC)
+## VPC Network Infrastructure 🌐
 
 * Assigned a CIDR block of 10.17.0.0/16.
 
-#### Subnets
+### Subnets
 
-##### Availability Zone A
+#### Availability Zone A
 
 
 | NAME     | CIDR          | AZ  | CustomIPv6Value |
@@ -39,7 +37,7 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 | sn-app-A | 10.17.32.0/20 | AZA | IPv6 02         |
 | sn-web-A | 10.17.48.0/20 | AZA | IPv6 03         |
 
-##### Availability Zone B
+#### Availability Zone B
 
 
 | NAME     | CIDR           | AZ  | CustomIPv6Value |
@@ -48,17 +46,17 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 | sn-app-B | 10.17.96.0/20  | AZB | IPv6 06         |
 | sn-web-B | 10.17.112.0/20 | AZB | IPv6 07         |
 
-#### Internet Gateway
+### Internet Gateway
 
 * An IGW is assigned to the VPC.
 
-#### Route Tables
+### Route Tables
 
 * A route table is attached to the VPC, and associated with the public web
   subnets in each AZ.
 * The following default routes were added:
 
-## Application Server 💽
+## EC2 Application Server 💽
 
 ### User Data
 
@@ -105,11 +103,11 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
 ```
 
-### App Server Security Group
+### EC2 Security Group
 
 TBD.
 
-## Database 🗄️
+## RDS Database 🗄️
 
 TBD.
 
