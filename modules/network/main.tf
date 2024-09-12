@@ -1,7 +1,18 @@
 /**
-Name: Cloud Resilient Network Configuration
+Name: Cloud Resilient Network Module
 Contributors: HK Transfield, 2024
+
+Builds a simple Amazon Virtual Private Cloud architecture inside AWS. 
+The module creates a VPC with a public subnet for any internet traffic 
+and two private subnets intended for an application server and a database.
+
+This module is designed to be used as part of the Cloud Resilient Rails 
+Infrastructure project.
 */
+
+################################################################################
+# General Configuration Settings
+################################################################################
 
 locals {
   az_prefixes = ["A", "B"]
@@ -32,7 +43,7 @@ resource "aws_vpc" "this" {
 ################################################################################
 
 locals {
-  subnet_name = "${var.project_name}-sn"
+  subnet_name = "${local.vpc_name}-sn"
   newbits     = 8
 }
 

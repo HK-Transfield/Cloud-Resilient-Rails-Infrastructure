@@ -1,6 +1,13 @@
 /**
-Name: Cloud Resilient Application Load Balancer Configuration
+Name: Cloud Resilient Application Load Balancing Module
 Contributors: HK Transfield, 2024
+
+Provides a simple internet facing Application Load Balancer (ALB). The 
+ALB will automatically distribute traffic across the EC2 instances in 
+multiple Availability Zones.
+
+This module is designed to be used as part of the Cloud Resilient Rails 
+Infrastructure project.
 */
 
 ################################################################################
@@ -61,3 +68,5 @@ resource "aws_lb_listener" "this" {
 ################################################################################
 # Security Group
 ################################################################################
+
+#TODO - write the configuration for the alb module

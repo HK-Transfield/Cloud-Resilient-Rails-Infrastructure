@@ -2,9 +2,8 @@
 Name: Cloud Resilient Ruby-on-Rails Infrastructure
 Contributors: HK Transfield, 2024
 
-A simple Infrastructure-as-Code (IAC) project that 
-provisions a simple Ruby-on-Rails application in 
-AWS using Terraform. 
+A simple Infrastructure-as-Code (IAC) project that provisions a simple 
+Ruby-on-Rails application in AWS using Terraform.
 */
 
 ################################################################################
@@ -108,7 +107,7 @@ resource "aws_s3_bucket" "logs" {
 # Rails Application Load Balancer Configuration
 ################################################################################
 
-#TODO
+#TODO - Add alb config to root module
 
 ################################################################################
 # Rails Application Server Configuration
@@ -138,4 +137,4 @@ module "rails-app-server-A" {
 # Rails Database Configuration
 ################################################################################
 
-#TODO
+#TODO - Add db config to root module

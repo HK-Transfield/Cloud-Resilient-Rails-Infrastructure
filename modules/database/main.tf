@@ -1,6 +1,11 @@
 /**
-Name: Cloud Resilient Database Configuration
+Name: Cloud Resilient Database Module
 Contributors: HK Transfield, 2024
+
+Provisions a simple Amazon Relational Database Service (RDS) instance.
+
+This module is designed to be used as part of the Cloud Resilient Rails 
+Infrastructure project.
 */
 
 ################################################################################
