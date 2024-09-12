@@ -32,17 +32,3 @@ variable "subnet_id" {
   description = "The VPC subnet ID to launch in."
   type        = string
 }
-
-variable "vpc_zone_identifiers" {
-  description = "List of subnet IDs to launch resources in"
-  type        = list(string)
-}
-
-################################################################################
-# Load Balancers
-################################################################################
-
-variable "target_group_arns" {
-  description = "Set of ARNS for use with Application Load Balancing"
-  type        = list(string)
-}
