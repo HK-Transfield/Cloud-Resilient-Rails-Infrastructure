@@ -17,7 +17,7 @@ variable "db_password" {
 }
 
 variable "my_ip" {
-  description = "Personal IP address"
+  description = "Personal IP address for SSH access"
   type        = string
   sensitive   = true
 }
