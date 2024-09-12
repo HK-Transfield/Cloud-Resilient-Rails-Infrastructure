@@ -80,6 +80,22 @@ resource "aws_autoscaling_group" "this" {
 }
 
 ################################################################################
+# Rails Storage Configuration
+################################################################################
+
+resource "random_id" "bucket" {
+  byte_length = 8
+}
+
+locals {
+  bucket_name = "rails-logs-${random_id.bucket.hex}"
+}
+
+resource "aws_s3_bucket" "logs" {
+  bucket = local.bucket_name
+}
+
+################################################################################
 # Rails Application Load Balancer Configuration
 ################################################################################
 
