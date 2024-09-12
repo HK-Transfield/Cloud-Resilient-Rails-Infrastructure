@@ -15,7 +15,7 @@ locals {
 }
 
 module "rails-network" {
-  source     = "./modules/rails-network"
+  source     = "./modules/network"
   cidr_block = "10.17.0.0/16"
   db_subnet_cidrs = {
     "A" = {
@@ -90,14 +90,14 @@ data "aws_key_pair" "this" {
 }
 
 module "rails-app-server-A" {
-  source    = "./modules/rails-app-server"
+  source    = "./modules/app-server"
   key_name  = data.aws_key_pair.this.key_name
   vpc_id    = module.rails-network.vpc_id
   subnet_id = module.rails-network.app_a_subnet_id
 }
 
 # module "rails-app-server-B" {
-#   source    = "./modules/rails-app-server"
+#   source    = "./modules/app-server"
 #   key_name  = data.aws_key_pair.this.key_name
 #   vpc_id    = module.rails-network.vpc_id
 #   subnet_id = module.rails-network.app_b_subnet_id
