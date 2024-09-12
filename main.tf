@@ -8,6 +8,14 @@ AWS using Terraform.
 */
 
 ################################################################################
+# General Configuration Settings
+################################################################################
+
+locals {
+  project_name = "rails"
+}
+
+################################################################################
 # Rails Network Configuration
 ################################################################################
 
@@ -19,8 +27,9 @@ locals {
 }
 
 module "rails-network" {
-  source     = "./modules/network"
-  cidr_block = "10.17.0.0/16"
+  source       = "./modules/network"
+  project_name = local.project_name
+  cidr_block   = "10.17.0.0/16"
   db_subnet_cidrs = {
     "A" = {
       cidr_block             = "10.17.16.0/20"
@@ -88,7 +97,7 @@ resource "random_id" "bucket" {
 }
 
 locals {
-  bucket_name = "rails-logs-${random_id.bucket.hex}"
+  bucket_name = "${locals.project_name}-logs-${random_id.bucket.hex}"
 }
 
 resource "aws_s3_bucket" "logs" {
@@ -110,14 +119,16 @@ data "aws_key_pair" "this" {
 }
 
 module "rails-app-server-A" {
-  source    = "./modules/app-server"
-  key_name  = data.aws_key_pair.this.key_name
-  vpc_id    = module.rails-network.vpc_id
-  subnet_id = module.rails-network.app_a_subnet_id
+  source       = "./modules/app-server"
+  project_name = local.project_name
+  key_name     = data.aws_key_pair.this.key_name
+  vpc_id       = module.rails-network.vpc_id
+  subnet_id    = module.rails-network.app_a_subnet_id
 }
 
 # module "rails-app-server-B" {
 #   source    = "./modules/app-server"
+#   project_name = local.project_name
 #   key_name  = data.aws_key_pair.this.key_name
 #   vpc_id    = module.rails-network.vpc_id
 #   subnet_id = module.rails-network.app_b_subnet_id
