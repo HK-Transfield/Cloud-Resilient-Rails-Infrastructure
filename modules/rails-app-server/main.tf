@@ -92,7 +92,7 @@ resource "aws_vpc_security_group_ingress_rule" "allow_all_ssh" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
-  security_group_id = aws_security_group.webserver.id
+  security_group_id = aws_security_group.this.id
   from_port         = 0
   to_port           = 0
   ip_protocol       = "-1" # Allows all outbound traffic
