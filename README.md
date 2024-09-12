@@ -1,4 +1,4 @@
-# AWS Hosted Ruby-On-Rails Web Application
+# AWS Hosted Ruby-On-Rails Web Application ♦
 
 The goal of this project is to help with familiarising
 yourself with deploying an entire infrastructure in
@@ -12,7 +12,7 @@ When deployed, it should display a webpage accessible through any web browser. T
 as the server-side web application framework. It would have a domain that would show it alternating
 between two Availability Zones via the Application Load Balancer.
 
-## Architecture Overview
+## Architecture Overview 🏗️
 
 ![Architecture of the project](/img/architecture-new.png)
 
@@ -22,15 +22,15 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 2. **Application Subnet:** A *private* Auto Scaling Group for spinning up another EC2 instance of the Rails webapp in required.
 3. **Database Subnet:** A *private* RDS database with Multi-AZ configured.
 
-## Network Architecture
+### Network Architecture 🌐
 
-### Virtual Private Cloud (VPC)
+#### Virtual Private Cloud (VPC)
 
 * Assigned a CIDR block of 10.17.0.0/16.
 
-#### Subnets
+##### Subnets
 
-##### Availability Zone A
+###### Availability Zone A
 
 
 | NAME     | CIDR          | AZ  | CustomIPv6Value |
@@ -39,7 +39,7 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 | sn-app-A | 10.17.32.0/20 | AZA | IPv6 02         |
 | sn-web-A | 10.17.48.0/20 | AZA | IPv6 03         |
 
-##### Availability Zone B
+###### Availability Zone B
 
 
 | NAME     | CIDR           | AZ  | CustomIPv6Value |
@@ -48,23 +48,26 @@ The project deploys a Multi-AZ Ruby-on-Rails web application with the following 
 | sn-app-B | 10.17.96.0/20  | AZB | IPv6 06         |
 | sn-web-B | 10.17.112.0/20 | AZB | IPv6 07         |
 
-#### Internet Gateway
+##### Internet Gateway
 
 * An IGW is assigned to the VPC.
 
-#### Route Tables
+##### Route Tables
 
 * A route table is attached to the VPC, and associated with the public web
   subnets in each AZ.
 * The following default routes were added:
 
-## Application Server Architecture
+### Application Server Architecture 💽
+
+#### User Data
 
 The Ruby-on-Rails application server runs on an EC2 instance. When launched, a bash script
 is passed as user data to install the Ruby Version Manager (RVM), Rails, and any other dependencies the
 instance needs. The script also logs the user-data output to the EC2 Systems Log
 
 ```bash
+
 exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
     # Step 1: Install dependencies
     echo "Installing dependencies..."
@@ -101,3 +104,24 @@ exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
     echo "Created new Rails app"
 
 ```
+
+#### App Server Security Group
+
+TBD.
+
+### Database Architecture 🗄️
+
+TBD.
+
+#### DB Security Group
+
+TBD.
+
+### Application Load Balancer Configuration 🚦
+
+TBD.
+
+#### ALB Security Group
+
+TBD.
+
