@@ -74,11 +74,12 @@ module "rails-network" {
 #TODO - Add alb config to root module
 
 ################################################################################
-# Rails Autoscaling Group Configuration
+# Rails Autoscaling Group w/ Storage Configuration
 ################################################################################
 
 locals {
-  asg_name = "rails-asg"
+  asg_name    = "${local.project_name}-asg"
+  bucket_name = "${locals.project_name}-logs-${random_id.bucket.hex}"
 }
 
 resource "aws_autoscaling_group" "this" {
@@ -93,16 +94,8 @@ resource "aws_autoscaling_group" "this" {
   #   launch_configuration      = aws_launch_configuration.rubyonrails.name
 }
 
-################################################################################
-# Rails Storage Configuration
-################################################################################
-
 resource "random_id" "bucket" {
   byte_length = 8
-}
-
-locals {
-  bucket_name = "${locals.project_name}-logs-${random_id.bucket.hex}"
 }
 
 resource "aws_s3_bucket" "logs" {
