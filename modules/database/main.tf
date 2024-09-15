@@ -1,6 +1,6 @@
 /**
 Name: Cloud Resilient Database Module
-Contributors: HK Transfield, 2024
+Author: HK Transfield, 2024
 
 Provisions a simple Amazon Relational Database Service (RDS) instance.
 
@@ -31,7 +31,6 @@ resource "aws_db_instance" "this" {
   skip_final_snapshot    = var.skip_final_snapshot
 
   tags = {
-    Name    = local.db_name
     Project = var.project_name
   }
 }
@@ -49,7 +48,6 @@ resource "aws_db_subnet_group" "this" {
   subnet_ids = var.subnet_ids
 
   tags = {
-    Name    = local.db_subnet_group_name
     Project = var.project_name
   }
 }
