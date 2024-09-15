@@ -3,6 +3,10 @@ variable "project_name" {
   type        = string
 }
 
+variable "project_tags" {
+  type = map(string)
+}
+
 ################################################################################
 # VPC Configuration
 ################################################################################
@@ -16,7 +20,7 @@ variable "cidr_block" {
 # Subnet Configurations
 ################################################################################
 
-variable "db_subnet_cidrs" {
+variable "db_sn" {
   description = "Private database subnet CIDR values"
   type = map(object({
     cidr_block             = string
@@ -25,7 +29,7 @@ variable "db_subnet_cidrs" {
   }))
 }
 
-variable "app_subnet_cidrs" {
+variable "app_sn" {
   description = "Private application subnet CIDR values"
   type = map(object({
     cidr_block             = string
@@ -34,7 +38,7 @@ variable "app_subnet_cidrs" {
   }))
 }
 
-variable "web_subnet_cidrs" {
+variable "web_sn" {
   description = "Public web subnet CIDR values"
   type = map(object({
     cidr_block             = string

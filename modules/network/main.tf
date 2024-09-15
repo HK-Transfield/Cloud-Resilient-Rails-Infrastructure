@@ -1,6 +1,6 @@
 /**
 Name: Cloud Resilient Network Module
-Contributors: HK Transfield, 2024
+Author: HK Transfield, 2024
 
 Builds a simple Amazon Virtual Private Cloud architecture inside AWS. 
 The module creates a VPC with a public subnet for any internet traffic 
@@ -48,7 +48,7 @@ locals {
 }
 
 resource "aws_subnet" "db" {
-  for_each                        = var.db_subnet_cidrs
+  for_each                        = var.db_sn
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = each.value.cidr_block
   ipv6_cidr_block                 = cidrsubnet(aws_vpc.this.ipv6_cidr_block, local.newbits, each.value.ipv6_cidr_block_netnum)
@@ -62,7 +62,7 @@ resource "aws_subnet" "db" {
 }
 
 resource "aws_subnet" "app" {
-  for_each                        = var.app_subnet_cidrs
+  for_each                        = var.app_sn
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = each.value.cidr_block
   ipv6_cidr_block                 = cidrsubnet(aws_vpc.this.ipv6_cidr_block, local.newbits, each.value.ipv6_cidr_block_netnum)
@@ -76,7 +76,7 @@ resource "aws_subnet" "app" {
 }
 
 resource "aws_subnet" "web" {
-  for_each                        = var.web_subnet_cidrs
+  for_each                        = var.web_sn
   vpc_id                          = aws_vpc.this.id
   cidr_block                      = each.value.cidr_block
   ipv6_cidr_block                 = cidrsubnet(aws_vpc.this.ipv6_cidr_block, local.newbits, each.value.ipv6_cidr_block_netnum)
