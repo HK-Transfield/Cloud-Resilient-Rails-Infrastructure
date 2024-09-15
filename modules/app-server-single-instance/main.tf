@@ -1,6 +1,6 @@
 /**
 Name: Cloud Resilient Application Server Module
-Contributors: HK Transfield, 2024
+Author: HK Transfield, 2024
 
 Provisions a simple application server using Amazon EC2 instances. Included 
 in the module is a  bash script for installing the Ruby Version Manager (RVM) 
