@@ -1,6 +1,6 @@
 /**
 Name: Cloud Resilient Ruby-on-Rails Infrastructure
-Contributors: HK Transfield, 2024
+Author: HK Transfield, 2024
 
 A simple Infrastructure-as-Code (IAC) project that provisions a simple 
 Ruby-on-Rails application in AWS using Terraform.
@@ -12,10 +12,13 @@ Ruby-on-Rails application in AWS using Terraform.
 
 locals {
   project_name = "rails"
+  project_tags = {
+    Project = local.project_name
+  }
 }
 
 ################################################################################
-# Rails Network Configuration
+# Three-tiered VPC Network Configuration
 ################################################################################
 
 data "aws_availability_zones" "available" {}
@@ -28,8 +31,9 @@ locals {
 module "rails-network" {
   source       = "./modules/network"
   project_name = local.project_name
+  project_tags = local.project_tags
   cidr_block   = "10.17.0.0/16"
-  db_subnet_cidrs = {
+  db_sn = {
     "A" = {
       cidr_block             = "10.17.16.0/20"
       ipv6_cidr_block_netnum = 1
@@ -41,7 +45,7 @@ module "rails-network" {
       availability_zone      = local.az_b
     }
   }
-  app_subnet_cidrs = {
+  app_sn = {
     "A" = {
       cidr_block             = "10.17.32.0/20"
       ipv6_cidr_block_netnum = 2
@@ -53,7 +57,7 @@ module "rails-network" {
       availability_zone      = local.az_b
     }
   }
-  web_subnet_cidrs = {
+  web_sn = {
     "A" = {
       cidr_block             = "10.17.96.0/20"
       ipv6_cidr_block_netnum = 3
@@ -68,32 +72,41 @@ module "rails-network" {
 }
 
 ################################################################################
-# Rails Application Load Balancer Configuration
+# Web Tier Configuration - Load Balancer & Storage
 ################################################################################
 
-#TODO - Add alb config to root module
+module "alb" {
+  source       = "./modules/load-balancer"
+  project_name = local.project_name
+  project_tags = local.project_tags
+  vpc_id       = module.rails-network.vpc_id
+  subnets = [
+    module.rails-network.web_a_subnet_id,
+    module.rails-network.web_b_subnet_id
+  ]
+}
 
 ################################################################################
-# Rails Autoscaling Group w/ Storage Configuration
+# App Tier Configuration - Auto Scaling Group 
 ################################################################################
 
 #TODO - Add asg config to root module
 
 ################################################################################
-# Rails Application Server Configuration
+# App Tier Configuration - Rails EC2 Instance
 ################################################################################
 
 data "aws_key_pair" "this" {
   key_name = "rails-key"
 }
 
-module "rails-app-server-A" {
-  source       = "./modules/app-server"
-  project_name = local.project_name
-  key_name     = data.aws_key_pair.this.key_name
-  vpc_id       = module.rails-network.vpc_id
-  subnet_id    = module.rails-network.app_a_subnet_id
-}
+# module "rails-app-server-A" {
+#   source       = "./modules/app-server"
+#   project_name = local.project_name
+#   key_name     = data.aws_key_pair.this.key_name
+#   vpc_id       = module.rails-network.vpc_id
+#   subnet_id    = module.rails-network.app_a_subnet_id
+# }
 
 # module "rails-app-server-B" {
 #   source    = "./modules/app-server"
@@ -104,7 +117,7 @@ module "rails-app-server-A" {
 # }
 
 ################################################################################
-# Rails Database Configuration
+# Database Tier Configuration - RDS
 ################################################################################
 
 #TODO - Add db config to root module
