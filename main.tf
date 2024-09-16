@@ -79,6 +79,7 @@ module "alb" {
   source       = "./modules/load-balancer"
   project_name = local.project_name
   project_tags = local.project_tags
+  asg_sg       = module.app-server.asg_security_group_id
   vpc_id       = module.rails-network.vpc_id
   subnets = [
     module.rails-network.web_a_subnet_id,
@@ -91,30 +92,21 @@ module "alb" {
 ################################################################################
 
 #TODO - Add asg config to root module
-
-################################################################################
-# App Tier Configuration - Rails EC2 Instance
-################################################################################
-
 data "aws_key_pair" "this" {
-  key_name = "rails-key"
+  key_name = "rails-key-pair"
 }
 
-# module "rails-app-server-A" {
-#   source       = "./modules/app-server"
-#   project_name = local.project_name
-#   key_name     = data.aws_key_pair.this.key_name
-#   vpc_id       = module.rails-network.vpc_id
-#   subnet_id    = module.rails-network.app_a_subnet_id
-# }
-
-# module "rails-app-server-B" {
-#   source    = "./modules/app-server"
-#   project_name = local.project_name
-#   key_name  = data.aws_key_pair.this.key_name
-#   vpc_id    = module.rails-network.vpc_id
-#   subnet_id = module.rails-network.app_b_subnet_id
-# }
+module "app-server" {
+  source              = "./modules/app-server-auto-scaling-group"
+  project_name        = local.project_name
+  project_tags        = local.project_tags
+  vpc_id              = module.rails-network.vpc_id
+  vpc_zone_identifier = [module.rails-network.app_a_subnet_id, module.rails-network.app_b_subnet_id]
+  target_group_arns   = [module.alb.target_group_arn]
+  lb_sg               = module.alb.lb_security_group_id
+  key_name            = data.aws_key_pair.this.key_name
+  my_ip               = var.my_ip
+}
 
 ################################################################################
 # Database Tier Configuration - RDS
