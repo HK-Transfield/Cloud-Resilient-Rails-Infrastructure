@@ -127,18 +127,61 @@ resource "aws_security_group" "this" {
   vpc_id = var.vpc_id
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_all_inbound" {
+resource "aws_vpc_security_group_ingress_rule" "allow_http_internet" {
   security_group_id = aws_security_group.this.id
-  description       = "Allow traffic in from public internet"
+  description       = "HTTP from the Load Balancer"
   from_port         = 80
   to_port           = 80
   ip_protocol       = "tcp"
   cidr_ipv4         = "0.0.0.0/0"
 }
 
-resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
+resource "aws_vpc_security_group_ingress_rule" "allow_https_internet" {
   security_group_id = aws_security_group.this.id
-  description       = "Send traffic out to the public internet"
-  ip_protocol       = "-1" # Allows all outbound traffic
+  description       = "HTTPS from the Load Balancer"
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
   cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_local_internet" {
+  security_group_id = aws_security_group.this.id
+  from_port         = 3000
+  to_port           = 3000
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+# resource "aws_vpc_security_group_egress_rule" "allow_all_outbound" {
+#   security_group_id = aws_security_group.this.id
+#   description       = "Send traffic out to the public internet"
+#   ip_protocol       = "-1" # Allows all outbound traffic
+#   cidr_ipv4         = "0.0.0.0/0"
+# }
+
+resource "aws_vpc_security_group_egress_rule" "send_http_app" {
+  security_group_id            = aws_security_group.this.id
+  description                  = "HTTP from the Load Balancer"
+  from_port                    = 80
+  to_port                      = 80
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.asg_sg
+}
+
+resource "aws_vpc_security_group_egress_rule" "send_https_app" {
+  security_group_id            = aws_security_group.this.id
+  description                  = "HTTPS from the Load Balancer"
+  from_port                    = 443
+  to_port                      = 443
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.asg_sg
+}
+
+resource "aws_vpc_security_group_egress_rule" "send_local_app" {
+  security_group_id            = aws_security_group.this.id
+  from_port                    = 3000
+  to_port                      = 3000
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = var.asg_sg
 }
