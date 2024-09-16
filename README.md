@@ -22,7 +22,7 @@ between two Availability Zones via the Application Load Balancer.
 
 ## High-level Architecture 🏗️
 
-![Architecture of the project](/imgs/architecture-new.png)
+![Architecture of the project](https://i.ibb.co/LxSp9v4/architecture-new.png)
 
 The project deploys a Multi-AZ Ruby-on-Rails web application with the following tiers:
 
