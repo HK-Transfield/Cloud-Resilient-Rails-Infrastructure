@@ -16,3 +16,8 @@ variable "vpc_id" {
   description = "ID for the VPC to deploy the load balancer in"
   type        = string
 }
+
+variable "asg_sg" {
+  description = "Auto Scaling Group Security Group to send traffic to"
+  type        = string
+}
