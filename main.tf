@@ -28,7 +28,7 @@ locals {
   az_b = data.aws_availability_zones.available.names[1]
 }
 
-module "rails-network" {
+module "network" {
   source       = "./modules/network"
   project_name = local.project_name
   project_tags = local.project_tags
