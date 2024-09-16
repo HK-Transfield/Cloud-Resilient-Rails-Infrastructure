@@ -81,17 +81,13 @@ module "alb" {
   project_tags = local.project_tags
   asg_sg       = module.app-server.asg_security_group_id
   vpc_id       = module.rails-network.vpc_id
-  subnets = [
-    module.rails-network.web_a_subnet_id,
-    module.rails-network.web_b_subnet_id
-  ]
+  subnets      = [module.rails-network.web_a_subnet_id, module.rails-network.web_b_subnet_id]
 }
 
 ################################################################################
 # App Tier Configuration - Auto Scaling Group 
 ################################################################################
 
-#TODO - Add asg config to root module
 data "aws_key_pair" "this" {
   key_name = "rails-key-pair"
 }
