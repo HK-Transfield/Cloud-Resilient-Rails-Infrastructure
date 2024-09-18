@@ -4,6 +4,9 @@
 # VSCode
 **/.vscode
 
+# Load Balancer Logs
+**/.logs
+
 # Key Pairs
 *.pem
 
