@@ -80,8 +80,8 @@ module "alb" {
   project_name = local.project_name
   project_tags = local.project_tags
   asg_sg       = module.app-server.asg_security_group_id
-  vpc_id       = module.rails-network.vpc_id
-  subnets      = [module.rails-network.web_a_subnet_id, module.rails-network.web_b_subnet_id]
+  vpc_id       = module.network.vpc_id
+  subnets      = [module.network.web_a_subnet_id, module.network.web_b_subnet_id]
 }
 
 ################################################################################
@@ -93,11 +93,11 @@ data "aws_key_pair" "this" {
 }
 
 module "app-server" {
-  source              = "./modules/app-server-auto-scaling-group"
+  source              = "./modules/app-server"
   project_name        = local.project_name
   project_tags        = local.project_tags
-  vpc_id              = module.rails-network.vpc_id
-  vpc_zone_identifier = [module.rails-network.app_a_subnet_id, module.rails-network.app_b_subnet_id]
+  vpc_id              = module.network.vpc_id
+  vpc_zone_identifier = [module.network.app_a_subnet_id, module.network.app_b_subnet_id]
   target_group_arns   = [module.alb.target_group_arn]
   lb_sg               = module.alb.lb_security_group_id
   key_name            = data.aws_key_pair.this.key_name
