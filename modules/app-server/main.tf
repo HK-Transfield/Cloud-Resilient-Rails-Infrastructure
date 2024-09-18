@@ -18,7 +18,7 @@ locals {
 ################################################################################
 
 locals {
-  filename = "install_rails_yum.sh"
+  filename = "install_rails.sh"
   filepath = "${path.module}/scripts/${local.filename}"
 }
 
@@ -50,10 +50,45 @@ data "aws_ami" "amazon_linux" {
 }
 
 ################################################################################
-# Launch Template Configuration
+# Session Manager IAM Role
 ################################################################################
 
-#TODO - Add in the Launch Template Configuration
+locals {
+  iam_name = "${var.project_name}-ssm-ec2"
+}
+
+data "aws_iam_policy_document" "instance_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "ssm_ec2" {
+  name               = "${local.iam_name}-role"
+  assume_role_policy = data.aws_iam_policy_document.instance_assume_role_policy.json
+  tags               = var.project_tags
+}
+
+# The policy for Amazon EC2 Role to enable AWS Systems Manager service core functionality.
+resource "aws_iam_role_policy_attachment" "ssm_managed_instance_core" {
+  role       = aws_iam_role.ssm_ec2.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+}
+
+resource "aws_iam_instance_profile" "ssm_ec2" {
+  name = "${local.iam_name}-instance-profile"
+  role = aws_iam_role.ssm_ec2.name
+  tags = var.project_tags
+}
+
+################################################################################
+# Launch Template Configuration
+################################################################################
 
 locals {
   lt_name = "${var.project_name}-launch-template"
@@ -66,12 +101,16 @@ resource "aws_launch_template" "this" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.this.id]
 
+  iam_instance_profile {
+    name = aws_iam_instance_profile.ssm_ec2.name
+  }
+
   #! fixme: This may not be working as intended yet
   # user_data              = data.cloudinit_config.user_data.rendered
 
   tag_specifications {
     resource_type = "instance"
-    tags          = merge({ Name = "${local.app_server_name}-$${aws:region}-$${aws:availability-zone}" }, var.project_tags)
+    tags          = merge({ Name = "${local.app_server_name}" }, var.project_tags)
   }
 
   tags = var.project_tags
@@ -119,15 +158,6 @@ resource "aws_security_group" "this" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "allow_ssh_my_ip" {
-  security_group_id = aws_security_group.this.id
-  description       = "SSH from your personal IP"
-  from_port         = 22
-  to_port           = 22
-  ip_protocol       = "tcp"
-  cidr_ipv4         = var.my_ip
-}
-
 resource "aws_vpc_security_group_ingress_rule" "allow_http_web" {
   security_group_id            = aws_security_group.this.id
   description                  = "HTTP from the Load Balancer"
@@ -162,3 +192,19 @@ resource "aws_vpc_security_group_ingress_rule" "allow_local_web" {
 #   ip_protocol                  = "-1" # Allows all outbound traffic
 #   referenced_security_group_id = var.db_sg
 # }
+
+#? Remove this later
+resource "aws_vpc_security_group_egress_rule" "allow_all_http" {
+  security_group_id = aws_security_group.this.id
+  from_port         = 80
+  to_port           = 80
+  ip_protocol       = "tcp" # Allows all outbound traffic
+  cidr_ipv4         = "0.0.0.0/0"
+}
+resource "aws_vpc_security_group_egress_rule" "allow_all_https" {
+  security_group_id = aws_security_group.this.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp" # Allows all outbound traffic
+  cidr_ipv4         = "0.0.0.0/0"
+}

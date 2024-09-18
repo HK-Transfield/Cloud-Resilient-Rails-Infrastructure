@@ -7,6 +7,11 @@ variable "project_tags" {
   type = map(string)
 }
 
+variable "region" {
+  type    = string
+  default = "ap-southeast-2"
+}
+
 ################################################################################
 # VPC Configuration
 ################################################################################

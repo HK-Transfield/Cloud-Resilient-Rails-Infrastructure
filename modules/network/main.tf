@@ -197,3 +197,80 @@ resource "aws_route_table_association" "app" {
   subnet_id      = each.value.id
   route_table_id = aws_route_table.private[each.key].id
 }
+
+################################################################################
+# VPC Endpoints
+################################################################################
+
+resource "aws_vpc_endpoint" "ssm" {
+  vpc_id       = aws_vpc.this.id
+  service_name = "com.amazonaws.${var.region}.ssm"
+
+  vpc_endpoint_type = "Interface" # This will create an elastic network interface for the endpoint
+
+  subnet_ids = [
+    aws_subnet.app["A"].id,
+    aws_subnet.app["B"].id
+  ]
+
+  security_group_ids = [aws_security_group.this.id]
+
+  tags = var.project_tags
+}
+
+resource "aws_vpc_endpoint" "ssm_messages" {
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.${var.region}.ssmmessages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [
+    aws_subnet.app["A"].id,
+    aws_subnet.app["B"].id
+  ]
+  security_group_ids = [aws_security_group.this.id]
+
+  tags = var.project_tags
+}
+
+resource "aws_vpc_endpoint" "ec2_messages" {
+  vpc_id            = aws_vpc.this.id
+  service_name      = "com.amazonaws.${var.region}.ec2messages"
+  vpc_endpoint_type = "Interface"
+  subnet_ids = [
+    aws_subnet.app["A"].id,
+    aws_subnet.app["B"].id
+  ]
+  security_group_ids = [aws_security_group.this.id]
+
+  tags = var.project_tags
+}
+
+################################################################################
+# Security Group
+################################################################################
+
+locals {
+  sg_name = "${local.vpc_name}-smm-endpoint-sg"
+}
+
+resource "aws_security_group" "this" {
+  name   = local.sg_name
+  vpc_id = aws_vpc.this.id
+
+  tags = var.project_tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "allow_https" {
+  security_group_id = aws_security_group.this.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "allow_https" {
+  security_group_id = aws_security_group.this.id
+  from_port         = 443
+  to_port           = 443
+  ip_protocol       = "tcp"
+  cidr_ipv4         = "0.0.0.0/0"
+}
