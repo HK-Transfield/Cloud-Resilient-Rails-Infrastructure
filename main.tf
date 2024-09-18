@@ -76,7 +76,7 @@ module "network" {
 ################################################################################
 
 module "alb" {
-  source       = "./modules/web-load-balancer"
+  source       = "./modules/web-traffic"
   project_name = local.project_name
   project_tags = local.project_tags
   asg_sg       = module.app-server.asg_security_group_id
